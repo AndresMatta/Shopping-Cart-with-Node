@@ -1,1 +1,16 @@
-[{"title":"Lorem ipsum"},{"title":"A new thread"},{"title":"Software Development"}]
+[
+  {
+    "id": "3245q",
+    "title": "Software Development",
+    "imageUrl": "https://image.freepik.com/free-vector/colorful-books-pack_23-2147523336.jpg",
+    "description": "A regular book about software engineering.",
+    "price": "12.99"
+  },
+  {
+    "id": "788",
+    "title": "Lorem ipsum",
+    "imageUrl": "https://image.freepik.com/free-vector/colorful-books-pack_23-2147523336.jpg",
+    "price": "19.99",
+    "description": "123123"
+  }
+]
