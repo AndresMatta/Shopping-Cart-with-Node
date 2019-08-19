@@ -2,14 +2,15 @@ const Product = require("../models/Product");
 const Cart = require("../models/Cart");
 
 const index = (req, res, next) => {
-  Product.all(products => {
-    res.render("shop/index", {
-      products,
-      pageTitle: "Shop",
-      path: "/",
-      hasProducts: products.length > 0
-    });
-  });
+  Product.findAll()
+    .then(products => {
+      res.render("shop/index", {
+        products,
+        pageTitle: "Shop",
+        path: "/"
+      });
+    })
+    .catch(err => console.log(err));
 };
 
 const getCart = (req, res, next) => {

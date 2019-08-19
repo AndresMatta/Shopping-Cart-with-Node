@@ -1,25 +1,27 @@
 const Product = require("../models/Product");
 
 const index = (req, res, next) => {
-  Product.all(products => {
-    res.render("shop/product-list", {
-      products: products,
-      pageTitle: "All Products",
-      path: "/products",
-      hasProducts: products.length > 0
-    });
-  });
+  Product.findAll()
+    .then(products => {
+      res.render("shop/product-list", {
+        products,
+        pageTitle: "Products",
+        path: "/products"
+      });
+    })
+    .catch(err => console.log(err));
 };
 
 const getAdminProducts = (req, res, next) => {
-  Product.all(products => {
-    res.render("admin/products", {
-      products: products,
-      pageTitle: "Admin Products",
-      path: "/admin/products",
-      hasProducts: products.length > 0
-    });
-  });
+  Product.findAll()
+    .then(products => {
+      res.render("admin/products", {
+        products,
+        pageTitle: "Admin Products",
+        path: "/admin/products"
+      });
+    })
+    .catch(err => console.log(err));
 };
 
 const create = (req, res, next) => {
@@ -30,52 +32,64 @@ const create = (req, res, next) => {
   });
 };
 
-const store = (req, res, next) => {
+const store = async (req, res, next) => {
   const { title, imageUrl, price, description } = req.body;
-  const product = new Product(null, title, imageUrl, price, description);
-  product.save();
-  res.redirect("/");
+  try {
+    await Product.create({ title, price, imageUrl, description });
+    res.redirect("/admin/products");
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 const show = (req, res, next) => {
-  const productId = req.params.productId;
-  Product.findById(productId, product => {
-    res.render("shop/product-details", {
-      product,
-      pageTitle: "details",
-      path: "/products"
-    });
-  });
+  Product.findByPk(req.params.productId)
+    .then(product => {
+      res.render("shop/product-details", {
+        product,
+        pageTitle: `${product.title} - Details`,
+        path: "/products"
+      });
+    })
+    .catch(err => console.log(err));
 };
 
 const edit = (req, res, next) => {
-  Product.findById(req.params.productId, product => {
-    if (!product) return res.redirect("/404");
-    res.render("admin/edit-product", {
-      product,
-      pageTitle: "Edit Product",
-      path: "/admin/edit-product",
-      editing: true
-    });
-  });
+  Product.findByPk(req.params.productId)
+    .then(product => {
+      if (!product) return res.redirect("/404");
+      res.render("admin/edit-product", {
+        product,
+        pageTitle: "Edit Product",
+        path: "/admin/edit-product",
+        editing: true
+      });
+    })
+    .catch(err => console.log(err));
 };
 
-const update = (req, res, next) => {
+const update = async (req, res, next) => {
   const { productId, title, imageUrl, price, description } = req.body;
-  const updatedProduct = new Product(
-    productId,
-    title,
-    imageUrl,
-    price,
-    description
-  );
-  updatedProduct.save();
-  res.redirect("/admin/products");
+  try {
+    const product = await Product.findByPk(productId);
+    product.title = title;
+    product.imageUrl = imageUrl;
+    product.price = price;
+    product.description = description;
+    await product.save();
+    res.redirect("/admin/products");
+  } catch (err) {
+    console.log(err);
+  }
 };
 
-const destroy = (req, res, next) => {
-  Product.delete(req.body.productId);
-  res.redirect("/admin/products");
+const destroy = async (req, res, next) => {
+  try {
+    await Product.destroy({ where: { id: req.body.productId } });
+    res.redirect("/admin/products");
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 module.exports = {
